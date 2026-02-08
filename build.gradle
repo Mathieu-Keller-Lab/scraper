@@ -32,6 +32,13 @@ dependencies {
 
     // Email
     implementation 'io.quarkus:quarkus-mailer'
+
+    // Hibernate and PostgreSQL
+    implementation 'io.quarkus:quarkus-hibernate-orm'
+    implementation 'io.quarkus:quarkus-jdbc-postgresql'
+
+    // Flyway for database migrations
+    implementation 'io.quarkus:quarkus-flyway'
 }
 
 tasks.withType(JavaCompile) {

@@ -2,6 +2,10 @@ services:
   backend:
     image: {{username}}/oakhouse-scraper:{{version}}
     restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
     environment:
       - QUARKUS_MAILER_FROM={{QUARKUS_MAILER_FROM}}
       - QUARKUS_MAILER_HOST={{QUARKUS_MAILER_HOST}}
@@ -12,5 +16,30 @@ services:
       - SCRAPER_TARGET_URLS={{SCRAPER_TARGET_URLS}}
       - QUARKUS_MAILER_TLS=FALSE
       - QUARKUS_MAILER_START_TLS=REQUIRED
+      - DATABASE_ADDRESS=postgres:5432
+      - DATABASE_SCHEMA=oakhouse_scraper
+      - DATABASE_USERNAME={{DATABASE_USERNAME}}
+      - DATABASE_PASSWORD={{DATABASE_PASSWORD}}
       - TZ=UTC
+  postgres:
+    image: postgres:16-alpine
+    container_name: oakhouse-postgres
+    environment:
+      POSTGRES_DB: oakhouse_scraper
+      POSTGRES_USER: {{DATABASE_USERNAME}}
+      POSTGRES_PASSWORD: {{DATABASE_PASSWORD}}
+    ports:
+      - "9821:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U {{DATABASE_USERNAME}} -d oakhouse_scraper || exit 1" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  volumes:
+    postgres_data:
+      driver: local
 

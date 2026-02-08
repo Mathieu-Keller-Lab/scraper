@@ -85,6 +85,9 @@ jobs:
               "QUARKUS_MAILER_PASSWORD": "${{ secrets.MAILER_PASSWORD }}", 
               "SCRAPER_EMAIL_RECIPIENT": "${{ secrets.MAIL_RECIPIENT }}",
               "SCRAPER_TARGET_URLS": "${{ secrets.TARGET_URLS }}", 
+              "DATABASE_USERNAME": "${{ secrets.DATABASE_USERNAME }}",
+              "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
+              "version": "${{ needs.dry-release.outputs.new_version }}",
               "version": "${{ needs.dry-release.outputs.new_version }}",
               "username": "${{ secrets.DOCKER_USER }}"
             }

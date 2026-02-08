@@ -1,6 +1,9 @@
 package com.scraper;
 
+import com.scraper.entity.NotifiedVacancy;
+import com.scraper.repository.NotifiedVacancyRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 
 import java.util.HashSet;
@@ -15,11 +18,12 @@ public class VacancyTrackingService {
 
     private static final Logger LOG = Logger.getLogger(VacancyTrackingService.class);
 
+    @Inject
+    NotifiedVacancyRepository repository;
+
     // Stores vacancy IDs that are currently active (seen in the last scrape)
     private final Set<String> currentVacancies = ConcurrentHashMap.newKeySet();
 
-    // Stores vacancy IDs that have been notified
-    private final Set<String> notifiedVacancies = ConcurrentHashMap.newKeySet();
 
     /**
      * Checks if this vacancy is new and should trigger a notification
@@ -27,8 +31,10 @@ public class VacancyTrackingService {
      * @return true if email should be sent, false otherwise
      */
     public boolean shouldNotify(String vacancyId) {
-        // If we haven't notified about this vacancy before, we should notify
-        if (!notifiedVacancies.contains(vacancyId)) {
+        // Check database to see if we've notified about this vacancy before
+        boolean exists = repository.existsByVacancyId(vacancyId);
+
+        if (!exists) {
             LOG.info("New vacancy detected: " + vacancyId);
             return true;
         }
@@ -38,12 +44,18 @@ public class VacancyTrackingService {
     }
 
     /**
-     * Marks a vacancy as notified
-     * @param vacancyId The ID of the vacancy
+     * Marks a vacancy as notified by saving it to the database
+     * @param vacancyInfo The vacancy information
      */
-    public void markAsNotified(String vacancyId) {
-        notifiedVacancies.add(vacancyId);
-        LOG.debug("Marked vacancy " + vacancyId + " as notified");
+    public void markAsNotified(VacancyInfo vacancyInfo) {
+        NotifiedVacancy vacancy = new NotifiedVacancy(
+                vacancyInfo.vacancyId(),
+                vacancyInfo.shareHouseName(),
+                vacancyInfo.url(),
+                vacancyInfo.roomType()
+        );
+        repository.save(vacancy);
+        LOG.info("Marked vacancy " + vacancyInfo.vacancyId() + " as notified in database");
     }
 
     /**
@@ -56,10 +68,10 @@ public class VacancyTrackingService {
         Set<String> removedVacancies = new HashSet<>(currentVacancies);
         removedVacancies.removeAll(vacancyIds);
 
-        // Remove deleted vacancies from notified set so they can trigger again if they reappear
+        // Remove deleted vacancies from database so they can trigger again if they reappear
         for (String removedId : removedVacancies) {
-            if (notifiedVacancies.remove(removedId)) {
-                LOG.info("Vacancy " + removedId + " was removed, will notify again if it reappears");
+            if (repository.deleteByVacancyId(removedId)) {
+                LOG.info("Vacancy " + removedId + " was removed from database, will notify again if it reappears");
             }
         }
 
@@ -67,15 +79,16 @@ public class VacancyTrackingService {
         currentVacancies.clear();
         currentVacancies.addAll(vacancyIds);
 
+        long totalNotified = repository.count();
         LOG.debug("Updated current vacancies. Active: " + currentVacancies.size() +
-                  ", Total notified: " + notifiedVacancies.size());
+                  ", Total notified in DB: " + totalNotified);
     }
 
     /**
-     * Gets the count of currently tracked notified vacancies
+     * Gets the count of currently tracked notified vacancies from the database
      */
-    public int getNotifiedCount() {
-        return notifiedVacancies.size();
+    public long getNotifiedCount() {
+        return repository.count();
     }
 
     /**

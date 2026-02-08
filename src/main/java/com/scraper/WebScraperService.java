@@ -61,7 +61,7 @@ public class WebScraperService {
                     if (trackingService.shouldNotify(vacancy.vacancyId())) {
                         LOG.info("New vacancy found: " + vacancy);
                         emailService.sendVacancyNotification(vacancy);
-                        trackingService.markAsNotified(vacancy.vacancyId());
+                        trackingService.markAsNotified(vacancy);
                     }
                 }
 
