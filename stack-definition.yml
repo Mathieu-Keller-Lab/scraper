@@ -6,6 +6,12 @@ services:
       postgres:
         condition: service_healthy
         restart: true
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/q/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     environment:
       - QUARKUS_MAILER_FROM={{QUARKUS_MAILER_FROM}}
       - QUARKUS_MAILER_HOST={{QUARKUS_MAILER_HOST}}
