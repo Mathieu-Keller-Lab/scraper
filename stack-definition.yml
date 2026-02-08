@@ -22,7 +22,7 @@ services:
       - DATABASE_PASSWORD={{DATABASE_PASSWORD}}
       - TZ=UTC
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18.1-alpine@sha256:aa6eb304ddb6dd26df23d05db4e5cb05af8951cda3e0dc57731b771e0ef4ab29
     container_name: oakhouse-postgres
     environment:
       POSTGRES_DB: oakhouse_scraper
@@ -39,7 +39,7 @@ services:
       start_period: 30s
       timeout: 10s
 
-  volumes:
-    postgres_data:
-      driver: local
+volumes:
+  postgres_data:
+    driver: local
 
