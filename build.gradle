@@ -32,13 +32,6 @@ dependencies {
 
     // Email
     implementation 'io.quarkus:quarkus-mailer'
-
-    // Logging
-    implementation 'io.quarkus:quarkus-logging-json'
-
-    // Testing
-    testImplementation 'io.quarkus:quarkus-junit5'
-    testImplementation 'io.rest-assured:rest-assured'
 }
 
 tasks.withType(JavaCompile) {
