@@ -7,9 +7,8 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Service to track vacancy IDs that have been seen and notified
@@ -23,12 +22,9 @@ public class VacancyTrackingService {
     @Inject
     NotifiedVacancyRepository repository;
 
-    // Stores vacancy IDs that are currently active (seen in the last scrape)
-    private final Set<String> currentVacancies = ConcurrentHashMap.newKeySet();
-
-
     /**
      * Checks if this vacancy is new and should trigger a notification
+     *
      * @param vacancyId The ID of the vacancy
      * @return true if email should be sent, false otherwise
      */
@@ -47,6 +43,7 @@ public class VacancyTrackingService {
 
     /**
      * Marks a vacancy as notified by saving it to the database
+     *
      * @param vacancyInfo The vacancy information
      */
     public void markAsNotified(VacancyInfo vacancyInfo) {
@@ -63,11 +60,15 @@ public class VacancyTrackingService {
     /**
      * Updates the set of currently active vacancies
      * Should be called at the start of each scrape cycle
+     *
      * @param vacancyIds Set of vacancy IDs found in current scrape
      */
     public void updateCurrentVacancies(Set<String> vacancyIds) {
         // Find vacancies that were removed (in old set but not in new set)
-        Set<String> removedVacancies = new HashSet<>(currentVacancies);
+        Set<String> removedVacancies = repository.findAll()
+                .stream()
+                .map(NotifiedVacancy::getVacancyId)
+                .collect(Collectors.toSet());
         removedVacancies.removeAll(vacancyIds);
 
         // Remove deleted vacancies from database so they can trigger again if they reappear
@@ -77,27 +78,9 @@ public class VacancyTrackingService {
             }
         }
 
-        // Update current vacancies
-        currentVacancies.clear();
-        currentVacancies.addAll(vacancyIds);
-
         long totalNotified = repository.count();
-        LOG.debug("Updated current vacancies. Active: " + currentVacancies.size() +
-                  ", Total notified in DB: " + totalNotified);
-    }
-
-    /**
-     * Gets the count of currently tracked notified vacancies from the database
-     */
-    public long getNotifiedCount() {
-        return repository.count();
-    }
-
-    /**
-     * Gets the count of currently active vacancies
-     */
-    public int getCurrentCount() {
-        return currentVacancies.size();
+        LOG.debug("Updated current vacancies. Active: " + (vacancyIds.size() - removedVacancies.size()) +
+                ", Total notified in DB: " + totalNotified);
     }
 }
 

@@ -144,12 +144,12 @@ public class WebScraperService {
                                 .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
                         VacancyInfo vacancy = new VacancyInfo(
-                                vacancyId,
-                                url,
-                                shareHouseName,
-                                value,
+                                vacancyId.strip(),
+                                url.strip(),
+                                shareHouseName.strip(),
+                                value.strip(),
                                 "vacancy",
-                                timestamp
+                                timestamp.strip()
                         );
 
                         matchingVacancies.add(vacancy);
