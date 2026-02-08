@@ -4,6 +4,7 @@ import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import static io.quarkus.arc.ComponentsProvider.LOG;
 
@@ -11,6 +12,7 @@ import static io.quarkus.arc.ComponentsProvider.LOG;
  * Service responsible for sending email notifications
  */
 @ApplicationScoped
+@Transactional
 public class EmailNotificationService {
 
     @Inject

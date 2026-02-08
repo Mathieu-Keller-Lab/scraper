@@ -4,6 +4,7 @@ import io.quarkus.runtime.Startup;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import static io.quarkus.arc.ComponentsProvider.LOG;
 
@@ -11,7 +12,7 @@ import static io.quarkus.arc.ComponentsProvider.LOG;
  * Scheduler that runs the scraping job every 15 minutes
  */
 @ApplicationScoped
-@Startup
+@Transactional
 public class ScraperScheduler {
 
     @Inject

@@ -4,6 +4,7 @@ import com.scraper.entity.NotifiedVacancy;
 import com.scraper.repository.NotifiedVacancyRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Service to track vacancy IDs that have been seen and notified
  */
 @ApplicationScoped
+@Transactional
 public class VacancyTrackingService {
 
     private static final Logger LOG = Logger.getLogger(VacancyTrackingService.class);

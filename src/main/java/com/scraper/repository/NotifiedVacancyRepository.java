@@ -15,6 +15,7 @@ import java.util.Optional;
  * Repository for managing NotifiedVacancy entities using Hibernate
  */
 @ApplicationScoped
+@Transactional
 public class NotifiedVacancyRepository {
 
     private static final Logger LOG = Logger.getLogger(NotifiedVacancyRepository.class);

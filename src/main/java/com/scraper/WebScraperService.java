@@ -2,6 +2,7 @@ package com.scraper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.jsoup.Jsoup;
@@ -19,6 +20,7 @@ import java.util.Set;
  * Service responsible for scraping the Oakhouse website
  */
 @ApplicationScoped
+@Transactional
 public class WebScraperService {
 
     private static final Logger LOG = Logger.getLogger(WebScraperService.class);
