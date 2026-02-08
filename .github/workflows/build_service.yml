@@ -51,7 +51,7 @@ jobs:
           push: true
           platforms: linux/arm64
           tags: |
-            ${{ secrets.DOCKER_USER }}/giftcode:${{ needs.dry-release.outputs.new_version }}
+            ${{ secrets.DOCKER_USER }}/oakhouse-scraper:${{ needs.dry-release.outputs.new_version }}
   release:
     name: create release
     needs: [ backend_build ]
@@ -85,5 +85,6 @@ jobs:
               "QUARKUS_MAILER_PASSWORD": "${{ secrets.MAILER_PASSWORD }}", 
               "SCRAPER_EMAIL_RECIPIENT": "${{ secrets.MAIL_RECIPIENT }}",
               "SCRAPER_TARGET_URLS": "${{ secrets.TARGET_URLS }}", 
-              "version": "${{ needs.dry-release.outputs.new_version }}"
+              "version": "${{ needs.dry-release.outputs.new_version }}",
+              "username": "${{ secrets.DOCKER_USER }}"
             }
