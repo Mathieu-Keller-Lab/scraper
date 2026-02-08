@@ -60,7 +60,7 @@ public class WebScraperService {
                     allCurrentVacancyIds.add(vacancy.vacancyId());
 
                     // Only send email if this is a new vacancy
-                    if (trackingService.shouldNotify(vacancy.vacancyId())) {
+                    if (trackingService.shouldNotify(vacancy.vacancyId(), vacancy.shareHouseName())) {
                         LOG.info("New vacancy found: " + vacancy);
                         emailService.sendVacancyNotification(vacancy);
                         trackingService.markAsNotified(vacancy);
