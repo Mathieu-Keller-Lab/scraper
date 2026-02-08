@@ -24,7 +24,7 @@ public class EmailNotificationService {
      */
     public void sendVacancyNotification(VacancyInfo vacancyInfo) {
         try {
-            String subject = "🏠 Vacancy Alert: " + vacancyInfo.shareHouseName() + " - Apartment Available!";
+            String subject = "Vacancy Alert: " + vacancyInfo.shareHouseName() + " - Apartment Available!";
             String body = buildEmailBody(vacancyInfo);
 
             LOG.info("Sending email notification to: " + recipientEmail);
