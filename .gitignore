@@ -1,0 +1,10 @@
+.env
+target/
+*.iml
+.idea/
+*.log
+.DS_Store
+
+/.idea/
+/.gradle/
+/build/

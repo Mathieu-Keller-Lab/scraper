@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'io.quarkus' version '3.31.2'
+}
+
+group = 'com.scraper'
+version = '1.0.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    // Quarkus Core
+    implementation enforcedPlatform("io.quarkus.platform:quarkus-bom:3.31.2")
+    implementation 'io.quarkus:quarkus-arc'
+    implementation 'io.quarkus:quarkus-scheduler'
+
+    // REST Client
+    implementation 'io.quarkus:quarkus-rest-client'
+    implementation 'io.quarkus:quarkus-rest-client-jackson'
+
+    // HTML Parser
+    implementation 'org.jsoup:jsoup:1.17.2'
+
+    // Email
+    implementation 'io.quarkus:quarkus-mailer'
+
+    // Logging
+    implementation 'io.quarkus:quarkus-logging-json'
+
+    // Testing
+    testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.rest-assured:rest-assured'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+test {
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+
+
+

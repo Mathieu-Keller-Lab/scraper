@@ -1,0 +1,95 @@
+name: Build Service
+
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  dry-release:
+    name: dry release
+    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@2.2.4
+    with:
+      release-branch: main
+      dry: true
+  backend_build:
+    name: build backend (arm64)
+    runs-on: ubuntu-24.04
+    needs: [ dry-release ]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v7
+        with:
+          name: frontend
+          path: ./src/main/resources/META-INF/resources
+
+      - name: Build backend (no container)
+        run: ./gradlew build -x test
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push ARM image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/arm64
+          tags: |
+            ${{ secrets.DOCKER_USER }}/giftcode:${{ needs.dry-release.outputs.new_version }}
+  release:
+    name: create release
+    needs: [ backend_build ]
+    if: ${{ github.ref == 'refs/heads/main' && needs.dry-release.outputs.has_new_version == 'true'}}
+    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@2.2.4
+    with:
+      release-branch: main
+      dry: false
+  deploy:
+    name: deploy
+    needs: [ backend_build, dry-release ]
+    if: ${{ github.ref == 'refs/heads/main' && needs.dry-release.outputs.has_new_version == 'true'}}
+    runs-on: ubuntu-24.04
+    env:
+      NODE_TLS_REJECT_UNAUTHORIZED: '0'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: Mathieu-Keller-Lab/Portainer-Deploy@1.0.1
+        with:
+          portainerStackName: 'oakhouse'
+          portainerFilePath: 'stack-definition.yml'
+          portainerHost: ${{ secrets.PORTAINER_HOST }}
+          portainerApiKey: ${{ secrets.PORTAINER_API_KEY }}
+          portainerEnvVars: >
+            {
+              "QUARKUS_MAILER_FROM": "${{secrets.MAIL_FROM}}",
+              "QUARKUS_MAILER_HOST": "${{ secrets.MAILER_HOST }}",
+              "QUARKUS_MAILER_PORT": "${{ secrets.MAILER_PORT }}",
+              "QUARKUS_MAILER_START_TLS": "REQUIRED", 
+              "QUARKUS_MAILER_USERNAME": "${{ secrets.MAILER_USERNAME }}", 
+              "QUARKUS_MAILER_PASSWORD": "${{ secrets.MAILER_PASSWORD }}", 
+              "SCRAPER_EMAIL_RECIPIENT": "${{ secrets.MAIL_RECIPIENT }}",
+              "SCRAPER_TARGET_URLS": "${{ secrets.TARGET_URLS }}", 
+              "version": "${{ needs.dry-release.outputs.new_version }}"
+            }

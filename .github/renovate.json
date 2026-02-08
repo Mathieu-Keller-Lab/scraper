@@ -1,0 +1,119 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    ":semanticCommits",
+    "group:monorepos",
+    ":prImmediately",
+    ":prConcurrentLimitNone",
+    ":prHourlyLimitNone"
+  ],
+  "assigneesFromCodeOwners": true,
+  "dependencyDashboard": true,
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "rebase",
+  "platformAutomerge": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)application\\.[^/]*$/",
+        "/(^|/)application-test\\.[^/]*$/"
+      ],
+      "matchStrings": [
+        "base-jvm-image:\\s(?<depName>.*?):(?<currentValue>.*?)@(?<currentDigest>.*?)\\s",
+        "base-native-image:\\s(?<depName>.*?):(?<currentValue>.*?)@(?<currentDigest>.*?)\\s",
+        "image:\\s(?<depName>.*?)\n\\s*version:\\s(?<currentValue>.*?)\\s"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)stack-definition\\.[^/]*$/"
+      ],
+      "matchStrings": [
+        "image:\\s(?<depName>.*?):(?<currentValue>.*?)@(?<currentDigest>.*?)\\s"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "node-version:\\s*(?<currentValue>\\d+)"
+      ],
+      "datasourceTemplate": "node-version",
+      "depNameTemplate": "node"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)README\\.[^/]*$/"
+      ],
+      "matchStrings": [
+        "image:\\s(?<depName>.*?):(?<currentValue>.*?)\\s"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^build\\.gradle(\\..*)?$/"
+      ],
+      "matchStrings": [
+        "googleJavaFormat\\('(?<currentValue>[0-9\\.]+?)'\\)"
+      ],
+      "datasourceTemplate": "maven",
+      "depNameTemplate": "com.google.googlejavaformat:google-java-format"
+    }
+  ],
+  "commitMessageAction": "bump",
+  "commitMessageExtra": "from {{{currentValue}}} to {{#if isMajor}}{{{newMajor}}}{{else}}{{#if isSingleVersion}}{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}}",
+  "commitBodyTable": true,
+  "pre-commit": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "semanticCommitType": "fix",
+      "commitMessageExtra": "from {{{currentValue}}} to {{#if isMajor}}{{{newMajor}}}{{else}}{{#if isSingleVersion}}{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}}"
+    },
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "semanticCommitType": "fix",
+      "commitMessageExtra": "from {{{currentValue}}} to {{#if isMajor}}{{{newMajor}}}{{else}}{{#if isSingleVersion}}{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}}"
+    },
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "postUpdateOptions": [
+        "yarnDedupeHighest"
+      ],
+      "semanticCommitType": "fix",
+      "commitMessageExtra": "from {{{currentValue}}} to {{#if isMajor}}{{{newMajor}}}{{else}}{{#if isSingleVersion}}{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}}"
+    },
+    {
+      "semanticCommitType": "chore",
+      "commitMessageExtra": "from {{{currentValue}}} to {{#if isMajor}}{{{newMajor}}}{{else}}{{#if isSingleVersion}}{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}}",
+      "matchPackageNames": [
+        "com.google.googlejavaformat:{/,}**"
+      ]
+    }
+  ]
+}
