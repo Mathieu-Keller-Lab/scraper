@@ -77,9 +77,6 @@ public class WebScraperService {
                 LOG.error("Error during scraping URL " + url + ": " + e.getMessage(), e);
             }
         }
-
-        // Update tracking service with current vacancies
-        trackingService.updateCurrentVacancies(allCurrentVacancyIds);
         LOG.info("Scrape cycle completed. Active vacancies: " + allCurrentVacancyIds.size());
     }
 
@@ -100,6 +97,7 @@ public class WebScraperService {
 
     /**
      * Checks for vacancy elements with data-status="vacancy" and validates room type
+     *
      * @return Set of all matching vacancies found on the page
      */
     private Set<VacancyInfo> checkForVacancies(Document document, String url) {

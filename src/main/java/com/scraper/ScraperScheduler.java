@@ -22,7 +22,7 @@ public class ScraperScheduler {
      * Scheduled job that runs every 15 minutes
      * Cron expression: every 15 minutes
      */
-    @Scheduled(every = "15m")
+    @Scheduled(every = "30m")
     public void scheduledScrape() {
         LOG.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         LOG.info("Scheduled scraping job triggered");
