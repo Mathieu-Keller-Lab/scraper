@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     // Quarkus Core
-    implementation enforcedPlatform("io.quarkus.platform:quarkus-bom:3.31.2")
+    implementation enforcedPlatform("io.quarkus.platform:quarkus-bom:3.31.3")
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-scheduler'
     implementation "io.quarkus:quarkus-container-image-jib"
