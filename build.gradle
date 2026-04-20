@@ -28,7 +28,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-rest-client-jackson'
 
     // HTML Parser
-    implementation 'org.jsoup:jsoup:1.22.1'
+    implementation 'org.jsoup:jsoup:1.22.2'
 
     // Email
     implementation 'io.quarkus:quarkus-mailer'
