@@ -9,7 +9,7 @@ on:
 jobs:
   dry-release:
     name: dry release
-    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@2.2.4
+    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@2.2.5
     with:
       release-branch: main
       dry: true
@@ -56,7 +56,7 @@ jobs:
     name: create release
     needs: [ backend_build ]
     if: ${{ github.ref == 'refs/heads/main' && needs.dry-release.outputs.has_new_version == 'true'}}
-    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@2.2.4
+    uses: Mathieu-Keller-Lab/github-action-workflows/.github/workflows/semantic-release.yaml@2.2.5
     with:
       release-branch: main
       dry: false
